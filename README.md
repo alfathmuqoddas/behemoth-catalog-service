@@ -41,6 +41,17 @@ The service is designed to work with an external authentication service (e.g., `
     npm install
     ```
 
+### Docker
+
+1.  Build the Docker image:
+    ```bash
+    docker build -t localhost:5000/behemoth-nodejs-catalog-service .
+    ```
+2.  Run the Docker image:
+    ```bash
+    docker run -d -p 3010:3000 --env-file ./.env -e DB_HOST=host.docker.internal -v /home/alfath/keys:/usr/src/app/keys --add-host=host.docker.internal:host-gateway --name behemoth-catalog-service localhost:5000/behemoth-nodejs-catalog-service
+    ```
+
 ### Configuration
 
 Create a `.env` file in the root of the project. Refer to `.env.example` for all available options.
