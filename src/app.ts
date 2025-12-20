@@ -12,15 +12,11 @@ app.use(metricsMiddleware);
 
 app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, World!");
-});
-
 app.get("/metrics", async (req: Request, res: Response) => {
   res.set("Content-Type", register.contentType);
   res.end(await register.metrics());
 });
 
-app.use("/api/movies", moviesRoutes);
+app.use("/", moviesRoutes);
 
 export default app;

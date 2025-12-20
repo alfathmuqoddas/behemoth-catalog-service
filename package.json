@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-auth-service",
+  "name": "nodejs-catalog-service",
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
@@ -7,18 +7,23 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "dev": "nodemon src/server.ts",
-    "generate-keys": "npx ts-node scripts/generate-keys.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:status": "sequelize-cli db:migrate:status"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
     "pino-pretty": "^13.1.3",
@@ -35,6 +40,7 @@
     "@types/sequelize": "^4.28.20",
     "@types/validator": "^13.15.10",
     "nodemon": "^3.1.11",
+    "sequelize-cli": "^6.6.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
