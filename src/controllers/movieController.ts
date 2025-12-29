@@ -5,6 +5,7 @@ import logger from "../config/logger";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { AppError } from "../utils/AppError";
 import { moviesCreatedTotal } from "../config/metrics";
+import { Op } from "sequelize";
 
 export const getAllMovies = async (
   req: Request,
@@ -12,25 +13,28 @@ export const getAllMovies = async (
   next: NextFunction
 ) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const size = parseInt(req.query.size as string) || 10;
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.max(1, parseInt(req.query.size as string) || 10);
+    const title = req.query.title as string;
 
-    const currentPage = page > 0 ? page : 1;
-    const pageSize = size > 0 ? size : 10;
+    const offset = (page - 1) * limit;
 
-    const limit = pageSize;
-    const offset = (currentPage - 1) * pageSize;
+    const whereClause: any = {};
+    if (title) {
+      whereClause.title = { [Op.iLike]: `%${title}%` };
+    }
 
     const { count, rows } = await Movie.findAndCountAll({
-      limit: limit,
-      offset: offset,
+      limit,
+      offset,
+      where: whereClause,
       order: [["createdAt", "DESC"]],
     });
 
     res.status(200).json({
       totalItems: count,
       totalPages: Math.ceil(count / limit),
-      currentPage: currentPage,
+      currentPage: page,
       pageSize: limit,
       movies: rows,
     });
