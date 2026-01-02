@@ -6,6 +6,7 @@ import logger from "./config/logger";
 import { register } from "./config/metrics";
 import { metricsMiddleware } from "./middleware/metricsMiddleware";
 import { errorHandler } from "./middleware/errorHandler";
+import cors from "cors";
 
 const app: Application = express();
 
@@ -13,6 +14,7 @@ app.use(pinoHttp({ logger }));
 app.use(metricsMiddleware);
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/metrics", async (req: Request, res: Response) => {
   res.set("Content-Type", register.contentType);
