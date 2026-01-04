@@ -49,21 +49,27 @@ The service is designed to work with an external authentication service (e.g., `
     ```
 2.  Run the Docker image:
     ```bash
-    docker run -d -p 3010:3000 --env-file ./.env -e DB_HOST=host.docker.internal -v /home/alfath/keys:/usr/src/app/keys --add-host=host.docker.internal:host-gateway --name behemoth-catalog-service localhost:5000/behemoth-nodejs-catalog-service
+    docker run -d -p 3020:3020 --env-file ./.env -v /home/alfath/keys:/usr/src/app/keys --network your_shared_network --name behemoth-catalog-service localhost:5000/behemoth-nodejs-catalog-service
+    ```
+3.  Tips run the development server on docker container (make sure your postgres container is running on the same network)
+    ```bash
+    docker run --rm -v $(pwd):/app -w /app -p 3020:3020 --network proxy node:lts-alpine sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ```
 
 ### Configuration
 
 Create a `.env` file in the root of the project. Refer to `.env.example` for all available options.
 
-```bash
-PORT=3000
+```env
+DB_HOST=shared_postgres (make sure the container and postgres container in the same network)
+DB_HOST=localhost (if you are running postgres locally)
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=your_password
+PORT=3020
 NODE_ENV=development
-DB_DIALECT=sqlite
-DB_STORAGE=:memory:
-DB_SYNC=true
-JWT_PUBLIC_KEY_PATH=keys/public.pem
-OMDB_API_KEY=your_omdb_api_key_here
+DB_DIALECT=postgres
 ```
 
 ### Public Keys
@@ -96,6 +102,26 @@ Runs the compiled app in production mode.
 ### Monitoring
 
 - `GET /metrics` - Prometheus metrics.
+
+### Miscelaneous
+
+#### Liveness Check
+
+- **URL:** `/health/liveness`
+- **Method:** `GET`
+- **Description:** Returns a 200 OK response if the service is live.
+
+#### Readiness Check
+
+- **URL:** `/health/readyness`
+- **Method:** `GET`
+- **Description:** Returns a 200 OK response if the service is ready.
+
+#### Startup Check
+
+- **URL:** `/health/startup`
+- **Method:** `GET`
+- **Description:** Returns a 200 OK response if the service is started.
 
 ## Twelve-Factor App Compliance
 
