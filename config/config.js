@@ -1,22 +1,30 @@
-// config/config.js
 require("dotenv").config();
 
 module.exports = {
   development: {
-    username: process.env.DB_USER || "postgres",
-    password: process.env.DB_PASSWORD || "mypassword",
-    database: process.env.DB_NAME || "postgres",
-    host: process.env.DB_HOST || "127.0.0.1",
-    port: process.env.DB_PORT || 5432,
-    dialect: process.env.DB_DIALECT || "postgres",
-  },
-  test: {
+    dialect: "postgres",
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 5432),
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: "postgres",
-    host: process.env.DB_HOST,
-    dialect: "postgres",
+    database: process.env.DB_NAME,
+
+    // 🔑 schema for DDL
+    schema: "movie_service",
+
+    // 🔑 isolate migrations per service
+    migrationStorageTableName: "SequelizeMeta_movie",
+    migrationStorageTableSchema: "movie_service",
   },
+
+  test: {
+    dialect: "postgres",
+    host: process.env.DB_HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  },
+
   production: {
     use_env_variable: "DATABASE_URL",
     dialect: "postgres",
@@ -27,5 +35,9 @@ module.exports = {
         rejectUnauthorized: false,
       },
     },
+
+    schema: "movie_service",
+    migrationStorageTableName: "SequelizeMeta_movie",
+    migrationStorageTableSchema: "movie_service",
   },
 };

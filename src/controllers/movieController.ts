@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import axios from "axios";
 import Movie from "../models/Movies";
-import logger from "../config/logger";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { AppError } from "../utils/AppError";
 import { moviesCreatedTotal } from "../config/metrics";
@@ -39,7 +38,6 @@ export const getAllMovies = async (
       movies: rows,
     });
   } catch (error) {
-    logger.error({ error }, "Error retrieving movies");
     next(error);
   }
 };
@@ -57,7 +55,6 @@ export const getMovieById = async (
     }
     res.status(200).json(movie);
   } catch (error) {
-    logger.error({ error }, `Error retrieving movie with id ${req.params.id}`);
     next(error);
   }
 };
@@ -76,7 +73,6 @@ export const createMovie = async (
     moviesCreatedTotal.inc({ source: "direct" });
     res.status(201).json(movie);
   } catch (error: any) {
-    logger.error({ error }, "Error creating movie");
     if (error.name === "SequelizeValidationError") {
       return next(
         new AppError(400, error.errors.map((e: any) => e.message).join(", "))
@@ -144,7 +140,6 @@ export const createMovieByImdbId = async (
 
     res.status(201).json(newMovie);
   } catch (error: any) {
-    logger.error({ error }, "Error creating movie by IMDb ID");
     if (error.name === "SequelizeValidationError") {
       return next(
         new AppError(400, error.errors.map((e: any) => e.message).join(", "))
@@ -176,7 +171,6 @@ export const updateMovie = async (
       throw new AppError(404, "Movie not found");
     }
   } catch (error: any) {
-    logger.error({ error }, `Error updating movie with id ${req.params.id}`);
     if (error.name === "SequelizeValidationError") {
       return next(
         new AppError(400, error.errors.map((e: any) => e.message).join(", "))
@@ -207,7 +201,6 @@ export const deleteMovie = async (
       throw new AppError(404, "Movie not found");
     }
   } catch (error) {
-    logger.error({ error }, `Error deleting movie with id ${req.params.id}`);
     next(error);
   }
 };

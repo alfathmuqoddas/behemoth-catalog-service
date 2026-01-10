@@ -1,25 +1,40 @@
-// middleware/errorHandler.ts
-import { Request, Response, NextFunction } from "express";
+import { AppError } from "../utils/AppError";
+import type { Request, Response, NextFunction } from "express";
 import logger from "../config/logger";
 
 export const errorHandler = (
   err: any,
-  req: Request,
+  _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  logger.error(err);
 
-  if (statusCode === 500) {
-    logger.error(err);
-  } else {
-    logger.warn({ msg: message, path: req.path });
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      error: {
+        code: err.code,
+        message: err.message,
+      },
+    });
   }
 
-  res.status(statusCode).json({
-    status: "error",
-    message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  // Sequelize
+  if (err.name === "SequelizeValidationError") {
+    return res.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Invalid data",
+        details: err.errors.map((e: any) => e.message),
+      },
+    });
+  }
+
+  // Unknown / programmer error
+  res.status(500).json({
+    error: {
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Something went wrong",
+    },
   });
 };
