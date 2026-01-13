@@ -6,6 +6,11 @@ APP_DIR    := /app
 HOST_DIR   := $(CURDIR)
 PORT       ?= 3020
 NETWORK    ?= proxy
+TAG        ?= latest
+SERVICE_NAME := behemoth-catalog-service
+REGISTRY     := registry.local:5000
+FULL_IMAGE   := $(REGISTRY)/$(SERVICE_NAME):$(TAG)
+KEYS_PATH    := /home/alfath/Downloads/behemoth/secrets/keys
 
 # ===== Helpers =====
 define docker_run
@@ -28,6 +33,15 @@ dev:
 
 build:
 	$(call docker_run,$(IMAGE) sh -c "npm run build")
+
+build-images:
+	docker build -t $(FULL_IMAGE) .
+
+push-images:
+	docker push $(FULL_IMAGE)
+
+run-images:
+	docker run -d -p $(PORT):$(PORT) --env-file ./.env --network $(NETWORK) -v $(KEYS_PATH):/app/keys --name $(SERVICE_NAME) $(FULL_IMAGE)
 
 shell:
 	$(call docker_run,$(IMAGE) sh)
